@@ -4,16 +4,16 @@ import time
 
 MENU_PROMPT = """
 
-        --- Coffee Bean App ---
+        --- Pizza App ---
 
 Please choose one of these options:
 
-1) Add a new bean.
-2) Find bean by name.
-3) See all beans.
-4) Search beans by rating.
-5) See which preparation method is best for a bean.
-6) Delete bean by name.
+1) Add a new pizza.
+2) Find pizza by style.
+3) See all pizzas.
+4) Search pizzas by rating.
+5) See which toppings are best for a style of pizza.
+6) Delete pizza by style.
 7) Exit.
 
 Your selection: """
@@ -25,31 +25,31 @@ def menu():
 
     while (user_input := input(MENU_PROMPT)) != "7":
         if user_input == "1":
-            prompt_add_new_bean(connection)
+            prompt_add_new_pizza(connection)
         elif user_input == "2":
-            prompt_find_bean(connection)
+            prompt_find_pizza(connection)
         elif user_input == "3":
-            prompt_see_all_beans(connection)
+            prompt_see_all_pizzas(connection)
         elif user_input == "4":
-            prompt_search_bean_rating(connection)
+            prompt_search_pizza_rating(connection)
         elif user_input == "5":
-            prompt_find_best_method(connection)
+            prompt_find_best_toppings(connection)
         elif user_input == "6":
-            prompt_delete_bean(connection)
+            prompt_delete_pizza(connection)
         else:
             print("   Invalid input, please try again!")
             time.sleep(1)
 
 
-def prompt_add_new_bean(connection):
-    name = input("\nEnter bean name: ").title()
-    if not name:
-        print("   Please enter a name!")
+def prompt_add_new_pizza(connection):
+    style = input("\nEnter pizza style: ").title()
+    if not style:
+        print("   Please enter a style!")
         time.sleep(1)
         return
-    method = input("Enter how you've prepared it: ").title()
-    if not method:
-        print("   Please enter a method!")
+    toppings = input("Enter the topping(s): ").title()
+    if not toppings:
+        print("   Please enter some toppings!")
         time.sleep(1)
         return
     rating = int(input("Enter your rating score (0-10): "))
@@ -58,34 +58,34 @@ def prompt_add_new_bean(connection):
         time.sleep(1)
         return
     else:
-        database.add_bean(connection, name, method, rating)
-        print(f"   Added: {name} ({method}) - {rating}/10")
+        database.add_pizza(connection, style, toppings, rating)
+        print(f"   Added: {style} ({toppings}) - {rating}/10")
         time.sleep(2)
 
-def prompt_find_bean(connection):
-    name = input("Enter bean name to find: ").title()
-    beans = database.get_beans_by_name(connection, name)
-    if not beans:
-        print("   Cannot find bean name!")
+def prompt_find_pizza(connection):
+    style = input("Enter pizza style to find: ").title()
+    pizzas = database.get_pizzas_by_style(connection, style)
+    if not pizzas:
+        print("   Cannot find pizza style!")
         time.sleep(1)
     else:
-        for bean in beans:
-            print(f"   {bean[1]} ({bean[2]}) - {bean[3]}/10")
+        for pizza in pizzas:
+            print(f"   {pizza[1]} ({pizza[2]}) - {pizza[3]}/10")
         time.sleep(2)
 
 
-def prompt_see_all_beans(connection):
-    beans = database.get_all_beans(connection)
-    if not beans:
-        print("   No beans found!")
+def prompt_see_all_pizzas(connection):
+    pizzas = database.get_all_pizzas(connection)
+    if not pizzas:
+        print("   No pizzas found!")
         time.sleep(1)
     else:
-        for bean in beans:
-            print(f"   {bean[1]} ({bean[2]}) - {bean[3]}/10")
+        for pizza in pizzas:
+            print(f"   {pizza[1]} ({pizza[2]}) - {pizza[3]}/10")
         time.sleep(2)
 
 
-def prompt_search_bean_rating(connection):
+def prompt_search_pizza_rating(connection):
     min_rating = int(input("Enter minimum range (0-10): "))
     max_rating = int(input("Enter maximum range (0-10): "))
     if min_rating < 0 or max_rating > 10 or min_rating > max_rating:
@@ -93,45 +93,45 @@ def prompt_search_bean_rating(connection):
         time.sleep(1)
         return
     else:
-        beans = database.get_beans_by_rating(connection, min_rating, max_rating)
-        if not beans:
-            print("   No bean ratings within that range!")
+        pizzas = database.get_pizzas_by_rating(connection, min_rating, max_rating)
+        if not pizzas:
+            print("   No pizza ratings within that range!")
             time.sleep(1)
         else:
-            for bean in beans:
-                print(f"   {bean[1]} ({bean[2]}) - {bean[3]}/10")
+            for pizza in pizzas:
+                print(f"   {pizza[1]} ({pizza[2]}) - {pizza[3]}/10")
             time.sleep(2)
 
 
-def prompt_find_best_method(connection):
-    name = input("Enter bean name to find: ").title()
+def prompt_find_best_toppings(connection):
+    style = input("Enter pizza style to find: ").title()
     try:
-        best_method = database.get_best_preparation_for_bean(connection, name)
-        print(f"   The best preparation method for {name} is: {best_method[2]}")
+        best_toppings = database.get_best_toppings_for_pizza(connection, style)
+        print(f"   The best toppings for {style} is: {best_toppings[2]}")
         time.sleep(2)
     except TypeError:
-        print("   Cannot find bean name!")
+        print("   Cannot find pizza style!")
         time.sleep(1)
 
 
-def prompt_delete_bean(connection):
-    name = input("Enter bean name to delete: ").title()
-    beans = database.get_beans_by_name(connection, name)
-    if not beans:
-        print("   Cannot find bean name!")
+def prompt_delete_pizza(connection):
+    style = input("Enter pizza style to delete: ").title()
+    pizzas = database.get_pizzas_by_style(connection, style)
+    if not pizzas:
+        print("   Cannot find pizza style!")
         time.sleep(1)
     else:
-        for bean in beans:
-            print(f"   ID {bean[0]}: {bean[1]} ({bean[2]}) - {bean[3]}/10")
+        for pizza in pizzas:
+            print(f"   ID {pizza[0]}: {pizza[1]} ({pizza[2]}) - {pizza[3]}/10")
         try:
-            ID = int(input("\nEnter the ID of the bean you want to delete: "))
-            valid_ID = [bean[0] for bean in beans]
+            ID = int(input("\nEnter the ID of the pizza you want to delete: "))
+            valid_ID = [pizza[0] for pizza in pizzas]
             if ID not in valid_ID:
                 print("   Invalid ID, please try again!")
                 time.sleep(1)
             else:
-                database.get_delete_bean(connection, name, ID)
-                print(f"   ID {ID}: {name} deleted.")
+                database.get_delete_pizza(connection, style, ID)
+                print(f"   ID {ID}: {style} deleted.")
                 time.sleep(2)
         except ValueError:
             print("   Invalid ID, please try again!")
